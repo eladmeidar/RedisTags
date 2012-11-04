@@ -4,7 +4,6 @@ module RedisTags
     attr_reader :owner, :owner_class, :owner_id, :tags
     
     def initialize(owner)
-
       @owner = owner
       @owner_class = owner.class.to_s.downcase
       @owner_id = owner.id
@@ -17,6 +16,9 @@ module RedisTags
         tag_name = tag_name.downcase.strip
         engine.sadd self.redis_key, tag_name
         engine.sadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
+      end
+      engine.multi do
+        Tag.register_tag_for_autocomplete(engine, tag_name)
       end
       super(tag_name)
     end
@@ -39,6 +41,7 @@ module RedisTags
           tag_name = tag_name.downcase.strip
           engine.sadd self.redis_key, tag_name
           engine.sadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
+          Tag.register_tag_for_autocomplete(engine, tag_name)
         end
       end
       self + tags

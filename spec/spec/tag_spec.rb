@@ -34,4 +34,12 @@ describe Tag do
 
     [@book1.id, @book2.id].should =~ Tag.tagged_with(Book, {:tags => ["elad"]}).collect(&:to_i)
   end
+
+  it "should log autocomplete options for each tag" do
+    @book = Book.new
+    @book.tag_list = "elad", "eli", "eliran hamelech shel ramle"
+    Book.tagged_with_prefix("el").should =~ ["elad", "eli", "eliran hamelech shel ramle"]
+    Book.tagged_with_prefix("ela").should =~ ["elad"]
+    Book.tagged_with_prefix("eli").should =~ ["eli", "eliran hamelech shel ramle"]
+  end
 end

@@ -31,6 +31,10 @@ module RedisTags
     def tagged_with(options = {})
       Tag.tagged_with(self, options)
     end
+
+    def tagged_with_prefix(partial_tag_name)
+      Tag.starts_with?(self.redis_tags_engine, partial_tag_name)
+    end
   end
 
   module InstanceMethods
@@ -46,6 +50,6 @@ module RedisTags
     def tag_list=(new_tag_list)
       @tag_list = RedisTags::TagList.new(self).append_mutli(new_tag_list)
     end
-    
+
   end
 end
