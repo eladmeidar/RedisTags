@@ -19,7 +19,16 @@ module RedisTags
         engine.sadd self.redis_key, tag_name
         engine.sadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
       end
-      super(tag_name.downcase)
+      super(tag_name)
+    end
+
+    def delete(tag_name)
+       engine.multi do
+        tag_name = tag_name.downcase.strip
+        engine.srem self.redis_key, tag_name
+        engine.srem "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
+      end
+      super(tag_name)
     end
 
     def append_mutli(tags)
