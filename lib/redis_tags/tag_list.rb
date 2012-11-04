@@ -8,7 +8,6 @@ module RedisTags
       @owner = owner
       @owner_class = owner.class.to_s.downcase
       @owner_id = owner.id
-      @tags = engine.smembers(self.redis_key)
       super(engine.smembers(self.redis_key))
     end
 

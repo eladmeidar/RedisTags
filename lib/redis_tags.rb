@@ -46,11 +46,6 @@ module RedisTags
     def tag_list=(new_tag_list)
       @tag_list = RedisTags::TagList.new(self).append_mutli(new_tag_list)
     end
-
-    private
-
-    def refresh_tag_list
-      @tag_list = nil
-    end
+    
   end
 end
