@@ -13,6 +13,10 @@ class Book
 
   def save
     @id = rand(1000)
-    self.tags_collection = RedisTags::TagList.new(self).append_multi(@tag_list)
+    after_save
+  end
+
+  def after_save
+    update_tags_to_redis
   end
 end

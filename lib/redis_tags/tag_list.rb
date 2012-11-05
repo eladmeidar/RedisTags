@@ -19,7 +19,7 @@ module RedisTags
           engine.sadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
         end
         engine.multi do
-          Tag.register_tag_for_autocomplete(engine, tag_name)
+          RedisTags::Tag.register_tag_for_autocomplete(engine, tag_name)
         end
       end
       super(tag_name)

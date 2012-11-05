@@ -51,6 +51,7 @@ Or install it yourself as:
         include RedisTags
 
         uses_redis_tags :engine => Redis.new
+        
     end
 
     @user = User.new

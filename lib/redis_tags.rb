@@ -10,7 +10,7 @@ module RedisTags
       extend ClassMethods
       include InstanceMethods
 
-      #after_save :update_tags_to_redis
+      after_save :update_tags_to_redis
 
       @@redis_tags_engine = nil
       @@acts_as_taggable_on_steroids_legacy = false
@@ -42,7 +42,7 @@ module RedisTags
     end
 
     def tagged_with_prefix(partial_tag_name)
-      Tag.starts_with?(self.redis_tags_engine, partial_tag_name)
+      RedisTags::Tag.starts_with?(self.redis_tags_engine, partial_tag_name)
     end
   end
 
