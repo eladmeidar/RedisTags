@@ -67,3 +67,4 @@ module RedisTags
       "#{self.owner_class}:tagged_with:#{self.name.downcase.gsub(" ", '-')}"
     end
   end
+end
