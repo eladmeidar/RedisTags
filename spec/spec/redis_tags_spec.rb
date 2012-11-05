@@ -9,7 +9,7 @@ describe RedisTags do
     it "should create multiple tags" do
       @book = Book.new
       @book.tags_collection = "elad, koko, loko"
-      @book.tags_collection.should =~ ["elad", "koko", "loko"]
+      @book.tags_collection.should  eql(["elad", "koko", "loko"])
     end
 
     it "should save a new tag using <<" do

@@ -10,6 +10,8 @@ module RedisTags
       extend ClassMethods
       include InstanceMethods
 
+      #after_save :update_tags_to_redis
+
       @@redis_tags_engine = nil
       @@acts_as_taggable_on_steroids_legacy = false
     end
@@ -65,8 +67,15 @@ module RedisTags
     end
 
     def tags_collection=(new_tag_list)
-      @tag_list = RedisTags::TagList.new(self).append_mutli(new_tag_list)
+      tags_collection.delete_all
+      @tag_list = RedisTags::TagList.new(self).append_multi(new_tag_list)
     end
 
+    private
+
+    # After save callback, confirms that redis is saved after object exists.
+    def update_tags_to_redis
+      tags_collection = @tag_list
+    end
   end
 end

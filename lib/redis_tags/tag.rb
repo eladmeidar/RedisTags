@@ -27,6 +27,7 @@ class Tag
   end
 
   def Tag.tagged_with(klass, options = {})
+#debugger
     key_array = []
     if options[:tags].to_a.size == 1
       if options[:random].to_i > 0
@@ -36,7 +37,7 @@ class Tag
       end
     else
       options[:tags].to_a.each do |tag_name|
-        key_array << Tag.tagged_with_key_for(klass, options[:tags])
+        key_array << Tag.tagged_with_key_for(klass, tag_name)
       end
       klass.redis_tags_engine.sinterstore Tag.intersect_key_for(klass, options[:tags]), *key_array
       if options[:random].to_i > 0
@@ -53,8 +54,8 @@ class Tag
     "#{klass.to_s.downcase}:inter:#{tags.sort.collect{ |tag_name| tag_name.downcase.strip.gsub(" ", '-') }.join(":")}"
   end
 
-  def Tag.tagged_with_key_for(klass, tags)
-    "#{klass.to_s.downcase}:tagged_with:#{tags.first.to_s.downcase.strip.gsub(" ", '-')}"
+  def Tag.tagged_with_key_for(klass, tag_name)
+    "#{klass.to_s.downcase}:tagged_with:#{tag_name.to_s.downcase.strip.gsub(" ", '-')}"
   end
 
   def engine

@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = RedisTags::VERSION
   gem.authors       = ["Elad Meidar"]
   gem.email         = ["elad@eizesus.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.description   = "A tagging system implemented in Redis graph"
+  gem.summary       = "This implementation consists over 3 basic rules. keep who is tagged, keep what is tagged and keep all tags."
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($/)
@@ -19,4 +19,5 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency "redis", "2.2.2"
   gem.add_development_dependency "rspec"
+  gem.add_development_dependency "ruby-debug"
 end
