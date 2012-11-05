@@ -1,5 +1,5 @@
 module RedisTags
-  class Tag
+  class RedisTag
     attr_accessor :name
     attr_reader :owner_class
 
@@ -24,27 +24,32 @@ module RedisTags
     end
 
     def count
-      engine.scard redis_key
+      engine.zcard redis_key
     end
 
     def self.tagged_with(klass, options = {})
-  #debugger
       key_array = []
       if options[:tags].to_a.size == 1
         if options[:random].to_i > 0
-          klass.redis_tags_engine.srandmember RedisTags::Tag.tagged_with_key_for(klass, options[:tags]), options[:random].to_i
+          klass.redis_tags_engine.zrandmember RedisTags::RedisTag.tagged_with_key_for(klass, options[:tags]), options[:random].to_i
+        elsif options[:since]
+          klass.redis_tags_engine.zrangebyscore RedisTags::RedisTag.tagged_with_key_for(klass, options[:tags]), options[:since].to_i, Time.now.to_i
         else
-          klass.redis_tags_engine.smembers RedisTags::Tag.tagged_with_key_for(klass, options[:tags])
+          klass.redis_tags_engine.zrangebyscore RedisTags::RedisTag.tagged_with_key_for(klass, options[:tags]), Time.now.to_i - 7 * 60 * 60 * 24, Time.now.to_i
         end
       else
         options[:tags].to_a.each do |tag_name|
-          key_array << Tag.tagged_with_key_for(klass, tag_name)
+          key_array << RedisTag.tagged_with_key_for(klass, tag_name)
         end
-        klass.redis_tags_engine.sinterstore RedisTags::Tag.intersect_key_for(klass, options[:tags]), *key_array
+
+        klass.redis_tags_engine.zinterstore RedisTags::RedisTag.intersect_key_for(klass, options[:tags]), key_array, {:aggregate => :max}
+
         if options[:random].to_i > 0
-          klass.redis_tags_engine.srandmember RedisTags::Tag.intersect_key_for(klass, options[:tags]), options[:random].to_i
+          klass.redis_tags_engine.zrandmember RedisTags::RedisTag.intersect_key_for(klass, options[:tags]), options[:random].to_i
+        elsif options[:since]
+          klass.redis_tags_engine.zrangebyscore RedisTags::RedisTag.intersect_key_for(klass, options[:tags]), options[:since].to_i, Time.now.to_i
         else
-          klass.redis_tags_engine.smembers RedisTags::Tag.intersect_key_for(klass, options[:tags])
+          klass.redis_tags_engine.zrangebyscore RedisTags::RedisTag.intersect_key_for(klass, options[:tags]), (Time.now.to_i - 7 * 60 * 60 * 24), Time.now.to_i
         end
       end
     end

@@ -1,6 +1,6 @@
 require "redis_tags/version"
-require "redis_tags/tag"
-require "redis_tags/tag_list"
+require "redis_tags/redis_tag"
+require "redis_tags/redis_tag_list"
 
 module RedisTags
   
@@ -38,28 +38,22 @@ module RedisTags
     end
 
     def tagged_with(options = {})
-      Tag.tagged_with(self, options)
+      RedisTag.tagged_with(self, options)
     end
 
     def tagged_with_prefix(partial_tag_name)
-      RedisTags::Tag.starts_with?(self.redis_tags_engine, partial_tag_name)
+      RedisTags::RedisTag.starts_with?(self.redis_tags_engine, partial_tag_name)
     end
   end
 
   module InstanceMethods
 
-    def tag_list
-      if self.class.acts_as_taggable_on_steroids_legacy_mode?
-        legacy_tag_list = super()
-        tags_collection = legacy_tag_list
-        legacy_tag_list
-      else
-        tags_collection
-      end
-    end
-
     def tags_collection
-      @tag_list ||= RedisTags::TagList.new(self)
+      if self.class.acts_as_taggable_on_steroids_legacy_mode?
+        @_tag_list ||= RedisTags::RedisTagList.new(self, self.tag_list) 
+      else
+        @_tag_list ||= RedisTags::RedisTagList.new(self)
+      end
     end
 
     def tag_with(tag)
@@ -68,14 +62,14 @@ module RedisTags
 
     def tags_collection=(new_tag_list)
       tags_collection.delete_all
-      @tag_list = RedisTags::TagList.new(self).append_multi(new_tag_list)
+      @_tag_list = RedisTags::RedisTagList.new(self, new_tag_list)
     end
 
     private
 
     # After save callback, confirms that redis is saved after object exists.
     def update_tags_to_redis
-      tags_collection = @tag_list
+      tags_collection = RedisTags::RedisTagList.new(self, @_tag_list)
     end
   end
 end

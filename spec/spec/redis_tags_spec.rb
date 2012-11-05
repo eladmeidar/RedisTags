@@ -9,18 +9,21 @@ describe RedisTags do
     it "should create multiple tags" do
       @book = Book.new
       @book.tags_collection = "elad, koko, loko"
+      @book.save
       @book.tags_collection.should  eql(["elad", "koko", "loko"])
     end
 
     it "should save a new tag using <<" do
       @book = Book.new
       @book.tag_with "elad"
+      @book.save
       @book.tags_collection.should eql(["elad"])
     end
 
     it "should save a new tag downcased" do
       @book = Book.new
       @book.tag_with "ELAD"
+      @book.save
       @book.tags_collection.should eql(["elad"])
     end
 
@@ -32,7 +35,7 @@ describe RedisTags do
       @book = Book.new
       lambda {
         @book.tag_list
-      }.should raise_error(NoMethodError)
+      }.should_not raise_error(NoMethodError)
     end
 
     it "should update Redis tags collection with backward compatibility for acts_as_taggable_on_steroids (#tag_list)" do
@@ -40,10 +43,7 @@ describe RedisTags do
         uses_redis_tags :acts_as_taggable_on_steroids_legacy_mode => true
       end
 
-      @book = Book.new
-      lambda {
-        @book.tag_list
-      }.should raise_error(NoMethodError)
+      @book = Book.new([])
 
       @book.tags_collection.should eql([])
     end

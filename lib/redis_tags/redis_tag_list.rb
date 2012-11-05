@@ -1,14 +1,20 @@
 module RedisTags
-  class TagList < Array
+  class RedisTagList < Array
 
     attr_reader :owner, :owner_class, :owner_id, :tags
     
-    def initialize(owner)
+    def initialize(owner, tags = nil)
       @owner = owner
       @owner_class = owner.class.to_s.downcase
       @owner_id = owner.id
-      super(engine.smembers(self.redis_key))
-      self
+      if tags.nil? && !(owner.id.nil?)
+        super(engine.smembers(self.redis_key))
+      else
+        if tags.nil?
+          tags = []
+        end
+        append_multi(tags)
+      end
     end
 
     def <<(tag_name)
@@ -16,10 +22,10 @@ module RedisTags
       if !(self.owner_id.nil?)
         engine.multi do
           engine.sadd self.redis_key, tag_name
-          engine.sadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
+          engine.zadd "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", @owner.created_at.to_i.to_s, self.owner_id
         end
         engine.multi do
-          RedisTags::Tag.register_tag_for_autocomplete(engine, tag_name)
+          RedisTags::RedisTag.register_tag_for_autocomplete(engine, tag_name)
         end
       end
       super(tag_name)
@@ -30,7 +36,7 @@ module RedisTags
       if !(self.owner_id.nil?)
         engine.multi do
           engine.srem self.redis_key, tag_name
-          engine.srem "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
+          engine.zrem "#{self.owner_class}:tagged_with:#{tag_name.gsub(" ", '-')}", self.owner_id
         end
       end
       super(tag_name)

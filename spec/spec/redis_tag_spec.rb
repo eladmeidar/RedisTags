@@ -1,14 +1,14 @@
 require 'spec_helper'
 
-describe Tag do
+describe RedisTags::RedisTag do
 
   before(:each) do
       Book.redis_tags_engine.flushdb
   end
 
-  it "should initialize a new Tag instance" do
+  it "should initialize a new RedisTag instance" do
     @b = Book.new
-    @t = Tag.new(@b, "koksi")
+    @t = RedisTags::RedisTag.new(@b, "koksi")
     @t.name.should == "koksi"
     @t.owner_class.should == "book"
     
@@ -18,14 +18,13 @@ describe Tag do
   it "should intersect more than 1 tag" do
     @book1 = Book.new
     @book2 = Book.new
-#debugger
     @book1.tags_collection = "elad, deddy, erez"
-
     @book1.save
+
     @book2.tags_collection = "elad, deddy"
     @book2.save
 
-    [@book1.id, @book2.id].should =~ Tag.tagged_with(Book, {:tags => ["elad", "deddy"]}).collect(&:to_i)
+    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.tagged_with(Book, {:tags => ["elad", "deddy"]}).collect(&:to_i)
   end
 
   it "should intersect 1 tag" do
@@ -37,7 +36,7 @@ describe Tag do
     @book2.tags_collection = "elad, deddy"
     @book2.save
 
-    [@book1.id, @book2.id].should =~ Tag.tagged_with(Book, {:tags => ["elad"]}).collect(&:to_i)
+    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.tagged_with(Book, {:tags => ["elad"]}).collect(&:to_i)
   end
 
   it "should log autocomplete options for each tag" do
