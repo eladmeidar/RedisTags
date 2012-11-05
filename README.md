@@ -61,7 +61,7 @@ Or install it yourself as:
 
     User.tagged_with(:tags => ["elad"])   # => [@user.id]
     User.tagged_with_prefix("el")         # => ["elad"]
-    
+
 ## Contributing
 
 1. Fork it
