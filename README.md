@@ -60,8 +60,8 @@ Or install it yourself as:
     @user.tag_collection = ["beata"]      # => ["beata"]
     @user.save
 
-    User.tagged_with(:tags => ["elad"])   # => [@user.id]
-    User.tagged_with_prefix("el")         # => ["elad"]
+    User.has_tags(:tags => ["elad"])   # => [@user.id]
+    User.tags_starting_with("el")         # => ["elad"]
 
 ## Contributing
 

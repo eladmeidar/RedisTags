@@ -24,7 +24,7 @@ describe RedisTags::RedisTag do
     @book2.tags_collection = "elad, deddy"
     @book2.save
 
-    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.tagged_with(Book, {:tags => ["elad", "deddy"]}).collect(&:to_i)
+    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.has_tags(Book, {:tags => ["elad", "deddy"]}).collect(&:to_i)
   end
 
   it "should intersect 1 tag" do
@@ -36,15 +36,15 @@ describe RedisTags::RedisTag do
     @book2.tags_collection = "elad, deddy"
     @book2.save
 
-    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.tagged_with(Book, {:tags => ["elad"]}).collect(&:to_i)
+    [@book1.id, @book2.id].should =~ RedisTags::RedisTag.has_tags(Book, {:tags => ["elad"]}).collect(&:to_i)
   end
 
   it "should log autocomplete options for each tag" do
     @book = Book.new
     @book.tags_collection = "elad", "eli", "eliran hamelech shel ramle"
     @book.save
-    Book.tagged_with_prefix("el").should =~ ["elad", "eli", "eliran hamelech shel ramle"]
-    Book.tagged_with_prefix("ela").should =~ ["elad"]
-    Book.tagged_with_prefix("eli").should =~ ["eli", "eliran hamelech shel ramle"]
+    Book.tags_starting_with("el").should =~ ["elad", "eli", "eliran hamelech shel ramle"]
+    Book.tags_starting_with("ela").should =~ ["elad"]
+    Book.tags_starting_with("eli").should =~ ["eli", "eliran hamelech shel ramle"]
   end
 end

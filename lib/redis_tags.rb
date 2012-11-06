@@ -37,11 +37,11 @@ module RedisTags
       @@redis_tags_engine
     end
 
-    def tagged_with(options = {})
-      RedisTag.tagged_with(self, options)
+    def has_tags(options = {})
+      RedisTags::RedisTag.has_tags(self, options)
     end
 
-    def tagged_with_prefix(partial_tag_name)
+    def tags_starting_with(partial_tag_name)
       RedisTags::RedisTag.starts_with?(self.redis_tags_engine, partial_tag_name)
     end
   end

@@ -27,7 +27,7 @@ module RedisTags
       engine.zcard redis_key
     end
 
-    def self.tagged_with(klass, options = {})
+    def self.has_tags(klass, options = {})
       key_array = []
       if options[:tags].to_a.size == 1
         if options[:random].to_i > 0
